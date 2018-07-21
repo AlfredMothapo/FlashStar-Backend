@@ -46,11 +46,12 @@ app.post("/flash", jsonParser, (req, res) => {
             res.send(err)
         })
 });
-app.post("/getInfiniteToken",(req,res)=>{ //returns a token that doesn't expire
-    rehive.auth.tokens.create({
-        password: req.body.password
-    }).then(function(token){
-       res.send(token);
+app.post("/topUp",jsonParser,(req,res)=>{ //returns a token that doesn't expire
+    rehive.transactions.createCredit({
+        amount: req.body.amount,
+        currency: req.body.currency
+    }).then(function(response){
+       res.send(response);
     },function(err){
         res.send(err);
     })
