@@ -2,7 +2,6 @@ const express = require('express')
 const firebase = require('firebase')
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json()
-const https = require("https");
 var app = express();
 const Rehive = require("rehive")
 
@@ -22,7 +21,14 @@ app.post("/register", jsonParser, (req, res) => {
         password2: req.body.password2,
         terms_and_conditions: true
     }).then((result) => {
-        res.send(result)
+        //create a lifetime token
+        rehive.auth.tokens.create({
+            password: req.body.password1
+        }).then(function(token){
+           res.send(token);
+        },function(err){
+            res.send(err);
+        })
     }, (error) => {
         console.log("Error :" + JSON.stringify(error))
         res.send(JSON.stringify(error))
@@ -33,11 +39,21 @@ app.post("/flash", jsonParser, (req, res) => {
         {
             amount: req.body.amount,
             recipient: req.body.recipient,
+            currency : req.body.currency
         }).then(function (response) {
             res.send(response)
         }, function (err) {
             res.send(err)
         })
+});
+app.post("/getInfiniteToken",(req,res)=>{ //returns a token that doesn't expire
+    rehive.auth.tokens.create({
+        password: req.body.password
+    }).then(function(token){
+       res.send(token);
+    },function(err){
+        res.send(err);
+    })
 });
 app.listen(8000, () => {
     console.log("Server started at localhost 8000")
